@@ -18,32 +18,36 @@ class Options(BaseOptions):
         parser.set_defaults(serial_batches=True)
         parser.set_defaults(no_flip=True)
         parser.set_defaults(phase='test')
-        parser.set_defaults(gpu_ids='-1')
         parser.set_defaults(name='coco_pretrained')
         self.isTrain = False
         return parser
 
 opt = Options().parse()
 
-@runway.setup(options={'checkpoints_root': runway.file})
+@runway.setup(options={'checkpoints_root': runway.file()})
 def setup(opts):
     opt.checkpoints_dir = os.path.join(opts['checkpoints_root'], 'checkpoints')
+    if not torch.cuda.is_available():
+        opt.gpu_ids = -1
     model = Pix2PixModel(opt)
     model.eval()
     return model
 
-@runway.command('convert', inputs={'input': runway.image(channels=1)}, outputs={'output': runway.image})
+@runway.command('convert', inputs={'semantic_map': runway.image(channels=1), 'reference': runway.image}, outputs={'output': runway.image})
 def convert(model, inputs):
-    img = np.array(inputs['input'])
+    img = np.array(inputs['semantic_map'])
+    reference = inputs['reference']
     h, w = img.shape[0:2]
     img = Image.fromarray(img)
     params = get_params(opt, (w, h))
     transform_label = get_transform(opt, params, method=Image.NEAREST, normalize=False)
     label_tensor = transform_label(img).unsqueeze(0)
+    transform_image = get_transform(opt, params)
+    image_tensor = transform_image(reference)
     data = {
         'label': label_tensor,
         'instance': label_tensor,
-        'image': None
+        'image': image_tensor
     }
     generated = model(data, mode='inference')
     output = util.tensor2im(generated[0])
