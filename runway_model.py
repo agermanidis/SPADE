@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import os
 import runway
 
 from options.test_options import TestOptions
@@ -24,15 +25,16 @@ class Options(BaseOptions):
 
 opt = Options().parse()
 
-@runway.setup
-def setup():
+@runway.setup(options={'checkpoints_root': runway.file})
+def setup(opts):
+    opt.checkpoints_dir = os.path.join(opts['checkpoints_root'], 'checkpoints')
     model = Pix2PixModel(opt)
     model.eval()
     return model
 
-@runway.command('convert', inputs={'image': runway.image(channels=1)}, outputs={'output': runway.image})
+@runway.command('convert', inputs={'input': runway.image(channels=1)}, outputs={'output': runway.image})
 def convert(model, inputs):
-    img = np.array(inputs['image'])
+    img = np.array(inputs['input'])
     h, w = img.shape[0:2]
     img = Image.fromarray(img)
     params = get_params(opt, (w, h))
@@ -41,11 +43,12 @@ def convert(model, inputs):
     data = {
         'label': label_tensor,
         'instance': label_tensor,
+        'image': None
     }
     generated = model(data, mode='inference')
     output = util.tensor2im(generated[0])
     output = Image.fromarray(output)
-    return dict(output=output)
+    return output
 
 if __name__ == '__main__':
-    runway.run()
+    runway.run(model_options={'checkpoints_root': '.'})
