@@ -3,4 +3,4 @@ torchvision
 dominate>=2.3.1
 dill
 scikit-image
-runway-python==0.0.68
+runway-python==0.0.69

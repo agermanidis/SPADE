@@ -43,8 +43,7 @@ def setup():
     return model
 
 command_inputs = {
-    'semantic_map': runway.semantic_map(label_map=label_map),
-    'reference': runway.image
+    'semantic_map': runway.semantic_map(label_map=label_map, width=256, height=256),
 }
 
 command_outputs = {
@@ -54,13 +53,12 @@ command_outputs = {
 @runway.command('convert', inputs=command_inputs, outputs=command_outputs)
 def convert(model, inputs):
     img = Image.fromarray(inputs['semantic_map'].astype(np.uint8))
-    reference = inputs['reference'].convert('RGB')
     params = get_params(opt, img.size)
     transform_label = get_transform(opt, params, method=Image.NEAREST, normalize=False)
     label_tensor = transform_label(img) * 255.0
     label_tensor[label_tensor == 255.0] = opt.label_nc
     transform_image = get_transform(opt, params)
-    image_tensor = transform_image(reference)
+    image_tensor = transform_image(Image.new('RGB', (500, 500)))
     data = {
         'label': label_tensor.unsqueeze(0),
         'instance': label_tensor.unsqueeze(0),
