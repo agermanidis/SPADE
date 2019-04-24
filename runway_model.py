@@ -9,6 +9,7 @@ from models.pix2pix_model import Pix2PixModel
 from options.base_options import BaseOptions
 from data.base_dataset import get_params, get_transform
 import util.util as util
+from util.coco import label_map
 
 class Options(BaseOptions):
     def initialize(self, parser):
@@ -34,16 +35,16 @@ class Options(BaseOptions):
 
 opt = Options().parse()
 
-@runway.setup(options={'checkpoints_root': runway.file()})
-def setup(opts):
-    opt.checkpoints_dir = os.path.join(opts['checkpoints_root'], 'checkpoints')
+@runway.setup
+def setup():
+    opt.checkpoints_dir = './checkpoints'
     model = Pix2PixModel(opt)
     model.eval()
     return model
 
-@runway.command('convert', inputs={'semantic_map': runway.image(channels=1), 'reference': runway.image}, outputs={'output': runway.image})
+@runway.command('convert', inputs={'semantic_map': runway.semantic_map(label_map=label_map), 'reference': runway.image}, outputs={'output': runway.image})
 def convert(model, inputs):
-    img = inputs['semantic_map']
+    img = Image.fromarray(inputs['semantic_map'].astype(np.uint8))
     reference = inputs['reference'].convert('RGB')
     params = get_params(opt, img.size)
     transform_label = get_transform(opt, params, method=Image.NEAREST, normalize=False)
@@ -62,4 +63,4 @@ def convert(model, inputs):
     return output
 
 if __name__ == '__main__':
-    runway.run(model_options={'checkpoints_root': '.'})
+    runway.run(port=5132, debug=True)
