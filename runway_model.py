@@ -63,4 +63,4 @@ def convert(model, inputs):
     return output
 
 if __name__ == '__main__':
-    runway.run(port=5132, debug=True)
+    runway.run(port=5132)
