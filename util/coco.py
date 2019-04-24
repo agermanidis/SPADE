@@ -4,6 +4,7 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 """
 
 label_map = {
+ 182: 'unlabeled',
  0: 'person',
  1: 'bicycle',
  2: 'car',
@@ -185,8 +186,7 @@ label_map = {
  178: 'waterdrops',
  179: 'window-blind',
  180: 'window-other',
- 181: 'wood',
- 182: 'unlabeled'
+ 181: 'wood'
  }
 
 def id2label(id):

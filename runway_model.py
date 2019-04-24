@@ -42,7 +42,16 @@ def setup():
     model.eval()
     return model
 
-@runway.command('convert', inputs={'semantic_map': runway.semantic_map(label_map=label_map), 'reference': runway.image}, outputs={'output': runway.image})
+command_inputs = {
+    'semantic_map': runway.semantic_map(label_map=label_map),
+    'reference': runway.image
+}
+
+command_outputs = {
+    'output': runway.image
+}
+
+@runway.command('convert', inputs=command_inputs, outputs=command_outputs)
 def convert(model, inputs):
     img = Image.fromarray(inputs['semantic_map'].astype(np.uint8))
     reference = inputs['reference'].convert('RGB')
