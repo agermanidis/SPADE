@@ -34,10 +34,10 @@ class Options(BaseOptions):
         self.isTrain = False
         return parser
 
-opt = Options().parse()
 
 @runway.setup(options={'checkpoints_root': runway.file(is_directory=True)})
 def setup(opts):
+    opt = Options().parse()
     opt.checkpoints_dir = opts['checkpoints_root']
     model = Pix2PixModel(opt)
     model.eval()

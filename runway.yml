@@ -2,5 +2,4 @@ cuda: 9.2
 python: 3.6
 entrypoint: python runway_model.py
 build_steps:
-  - apt-get update && apt-get install -y wget && wget https://s3.amazonaws.com/runway-checkpoints/spade_coco_checkpoint.tar.gz && tar xf spade_coco_checkpoint.tar.gz
   - pip install -r requirements.txt
