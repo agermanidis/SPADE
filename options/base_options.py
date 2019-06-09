@@ -73,11 +73,7 @@ class BaseOptions():
         return parser
 
     def gather_options(self):
-        # initialize parser with basic options
-        if not self.initialized:
-            parser = argparse.ArgumentParser(
-                formatter_class=argparse.ArgumentDefaultsHelpFormatter)            
-            parser = self.initialize(parser)
+        parser = self.parser
 
         # get the basic options
         opt, unknown = parser.parse_known_args()
@@ -100,7 +96,6 @@ class BaseOptions():
             parser = self.update_options_from_file(parser, opt)
 
         opt = parser.parse_args()
-        self.parser = parser
         return opt
 
     def print_options(self, opt):
@@ -172,7 +167,7 @@ class BaseOptions():
             id = int(str_id)
             if id >= 0:
                 opt.gpu_ids.append(id)
-        if len(opt.gpu_ids) > 0:
+        if torch.cuda.is_available():
             torch.cuda.set_device(opt.gpu_ids[0])
 
         assert len(opt.gpu_ids) == 0 or opt.batchSize % len(opt.gpu_ids) == 0, \

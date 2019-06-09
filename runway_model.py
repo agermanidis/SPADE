@@ -3,6 +3,7 @@ import torch
 import numpy as np
 import os
 import runway
+import argparse
 
 from options.test_options import TestOptions
 from models.pix2pix_model import Pix2PixModel
@@ -19,7 +20,6 @@ class Options(BaseOptions):
         parser.set_defaults(serial_batches=True)
         parser.set_defaults(no_flip=True)
         parser.set_defaults(phase='test')
-        parser.set_defaults(name='landscapes')
         parser.set_defaults(preprocess_mode='resize_and_crop')
         parser.set_defaults(load_size=512)
         parser.set_defaults(crop_size=512)
@@ -37,9 +37,13 @@ class Options(BaseOptions):
 
 @runway.setup(options={'checkpoints_root': runway.file(is_directory=True)})
 def setup(opts):
-    opt = Options().parse()
-    opt.checkpoints_dir = opts['checkpoints_root']
-    model = Pix2PixModel(opt)
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    options = Options()
+    parser = options.initialize(parser)
+    options.parser = parser
+    parser.set_defaults(name=opts['checkpoints_root'].split('/')[-1])
+    parser.set_defaults(checkpoints_dir=os.path.join(opts['checkpoints_root'], '..'))
+    model = Pix2PixModel(options.parse())
     model.eval()
     return model
 
@@ -70,4 +74,4 @@ def convert(model, inputs):
     return output
 
 if __name__ == '__main__':
-    runway.run(port=5132, debug=True, model_options={'checkpoints_root': './checkpoints'})
+    runway.run(port=5132, debug=True)
