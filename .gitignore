@@ -6,3 +6,4 @@ results/
 *.pkl
 *.pyc
 .DS_Store
+*.gz

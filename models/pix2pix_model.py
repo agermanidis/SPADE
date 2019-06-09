@@ -250,7 +250,7 @@ class Pix2PixModel(torch.nn.Module):
         return eps.mul(std) + mu
 
     def use_gpu(self):
-        return len(self.opt.gpu_ids) > 0
+        return torch.cuda.is_available()
 
     
         

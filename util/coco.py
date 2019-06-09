@@ -189,6 +189,9 @@ label_map = {
  181: 'wood'
  }
 
+label_to_id = {v: k for k, v in label_map.items()}
+
+
 def id2label(id):
     if id == 182:
         id = 0
