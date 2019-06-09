@@ -34,16 +34,23 @@ class Options(BaseOptions):
         self.isTrain = False
         return parser
 
+opt = None
 
 @runway.setup(options={'checkpoints_root': runway.file(is_directory=True)})
 def setup(opts):
+    global opt
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     options = Options()
     parser = options.initialize(parser)
     options.parser = parser
-    parser.set_defaults(name=opts['checkpoints_root'].split('/')[-1])
-    parser.set_defaults(checkpoints_dir=os.path.join(opts['checkpoints_root'], '..'))
-    model = Pix2PixModel(options.parse())
+    name = opts['checkpoints_root'].split('/')[-1]
+    checkpoints_dir = os.path.join(opts['checkpoints_root'], '..')
+    parser.set_defaults(name=name)
+    parser.set_defaults(checkpoints_dir=checkpoints_dir)
+    opt = options.parse()
+    opt.name = name
+    opt.checkpoints_dir = checkpoints_dir
+    model = Pix2PixModel(opt)
     model.eval()
     return model
 
@@ -74,4 +81,4 @@ def convert(model, inputs):
     return output
 
 if __name__ == '__main__':
-    runway.run(port=5132, debug=True)
+    runway.run(port=5132)
