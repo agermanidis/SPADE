@@ -10,7 +10,6 @@ from models.pix2pix_model import Pix2PixModel
 from options.base_options import BaseOptions
 from data.base_dataset import get_params, get_transform
 import util.util as util
-from util.coco import label_to_id
 
 class Options(BaseOptions):
     def initialize(self, parser):
@@ -46,8 +45,24 @@ def setup(opts):
     model.eval()
     return model
 
+label_to_id = {
+    'grass': 123,
+    'sky': 156,
+    'sea': 154,
+    'tree': 168,
+    'clouds': 105,
+}
+
+label_to_color = {
+    'grass': (29, 195, 49),
+    'sky': (95, 219, 255),
+    'sea': (54, 62, 167),
+    'tree': (140, 104, 47),
+    'clouds': (170, 170, 170),
+}
+
 command_inputs = {
-    'semantic_map': runway.segmentation(label_to_id=label_to_id, width=512, height=512),
+    'semantic_map': runway.segmentation(label_to_id=label_to_id, label_to_color=label_to_color, default_label='grass')
 }
 
 command_outputs = {
