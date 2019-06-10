@@ -20,14 +20,6 @@ class Options(BaseOptions):
         parser.set_defaults(serial_batches=True)
         parser.set_defaults(no_flip=True)
         parser.set_defaults(phase='test')
-        parser.set_defaults(preprocess_mode='resize_and_crop')
-        parser.set_defaults(load_size=512)
-        parser.set_defaults(crop_size=512)
-        parser.set_defaults(display_winsize=512)
-        parser.set_defaults(label_nc=182)
-        parser.set_defaults(contain_dontcare_label=False)
-        parser.set_defaults(cache_filelist_read=True)
-        parser.set_defaults(cache_filelist_write=True)
         parser.set_defaults(load_from_opt_file=True)
         if not torch.cuda.is_available():
             parser.set_defaults(gpu_ids="-1")
@@ -66,13 +58,14 @@ command_outputs = {
 def convert(model, inputs):
     img = inputs['semantic_map']
     original_size = img.size
-    img = img.resize((512, 512))
+    img = img.resize((opt.load_size, opt.load_size))
     params = get_params(opt, img.size)
     transform_label = get_transform(opt, params, method=Image.NEAREST, normalize=False)
-    label_tensor = transform_label(img).unsqueeze(0)
+    label_tensor = transform_label(img) * 255.0
+    label_tensor[label_tensor == 255.0] = 0
     data = {
-        'label': label_tensor,
-        'instance': label_tensor,
+        'label': label_tensor.unsqueeze(0),
+        'instance': label_tensor.unsqueeze(0),
         'image': None
     }
     generated = model(data, mode='inference')
