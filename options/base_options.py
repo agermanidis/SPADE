@@ -168,7 +168,7 @@ class BaseOptions():
             if id >= 0:
                 opt.gpu_ids.append(id)
         if torch.cuda.is_available():
-            torch.cuda.set_device(opt.gpu_ids[0])
+            torch.cuda.set_device(0)
 
         assert len(opt.gpu_ids) == 0 or opt.batchSize % len(opt.gpu_ids) == 0, \
             "Batch size %d is wrong. It must be a multiple of # GPUs %d." \
