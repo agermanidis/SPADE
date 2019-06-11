@@ -46,23 +46,29 @@ def setup(opts):
     return model
 
 label_to_id = {
+    'unlabeled': 182,
     'grass': 123,
     'sky': 156,
-    'sea': 154,
-    'tree': 168,
     'clouds': 105,
+    'sea': 154,
+    'river': 147,
+    'tree': 168,
+    'mountain': 134
 }
 
 label_to_color = {
+    'unlabeled': (0, 0, 0),
     'grass': (29, 195, 49),
     'sky': (95, 219, 255),
-    'sea': (54, 62, 167),
-    'tree': (140, 104, 47),
     'clouds': (170, 170, 170),
+    'sea': (54, 62, 167),
+    'river': (0, 57, 150),
+    'tree': (140, 104, 47),
+    'mountain': (60, 55, 50)
 }
 
 command_inputs = {
-    'semantic_map': runway.segmentation(label_to_id=label_to_id, label_to_color=label_to_color, default_label='grass')
+    'semantic_map': runway.segmentation(label_to_id=label_to_id, label_to_color=label_to_color, default_label='unlabeled')
 }
 
 command_outputs = {
